@@ -27,130 +27,111 @@ import com.CineReserve.Theatre.Theatre;
 @RequestMapping("/book")
 public class BookingController {
 
-    @Autowired
-    private BookingService bookingService;
+	@Autowired
+	private BookingService bookingService;
 
-    @PostMapping("/create")
-    public ResponseEntity<String> createBooking(@RequestBody BookingDTO dto) throws UserNotfoundException {
-       
-            // Step 1: Check if the seat is already booked
-            if (bookingService.isSeatAlreadyBooked(dto)) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("Seat already booked And Please Book Another Seat");
-            }
+	@PostMapping("/create")
+	public ResponseEntity<String> createBooking(@RequestBody BookingDTO dto) throws UserNotfoundException {
 
-            // Step 2: Save the booking
-            bookingService.saveBooking(dto);
-            return ResponseEntity.status(HttpStatus.CREATED).body("Ticket booked successfully And Enjoy Your Movie");
+		// Step 1: Check if the seat is already booked
+		if (bookingService.isSeatAlreadyBooked(dto)) {
+			return ResponseEntity.status(HttpStatus.CONFLICT).body("Seat already booked And Please Book Another Seat");
+		}
 
-          
-        }
-    
-    
-    
-    @PutMapping("/cancel/{Bookingid}")
-    public ResponseEntity<String> cancelBooking(@PathVariable String Bookingid , @RequestBody CancelDto dto) throws UserNotfoundException
-    {
-    	
-    	try {
-       	 String    status  =bookingService.CancelBooking(Bookingid, dto.getUserid(), dto.getReason());
-       	 
-       	 return ResponseEntity.ok(status);
-
-        } catch (CancelBookingException  e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                                 .body("Error : " +  e.getMessage());
-        }
-    	
-    	
-    
-    	}
-                  @GetMapping("/findAllMovies")
-                  public List<Movie> FindAllMovies()
-                  {
-                	  
-                	    List<Movie> m1 = bookingService.getAllMovies();
-                	     
-                	     return m1;
-    }
-                  
-                  @GetMapping("/FindAllTheatres")
-                  public List<Theatre> FindAllTheatre()
-                  {
-                	  List<Theatre> t2 = bookingService.getAlltheatres();
-                	 
-                	    return t2;
-                  }
-                  
+		// Step 2: Save the booking
+		bookingService.saveBooking(dto);
+		return ResponseEntity.status(HttpStatus.CREATED).body("Ticket booked successfully And Enjoy Your Movie");
+	}
 
 
-                  @GetMapping("/getByseatid/{id}")
-                  public ResponseEntity<String> getbyseatNumber(@PathVariable ("id") String seatNumber)
-                  {
-                  	       BookMyShow s1 = bookingService.findbyseatnumber(seatNumber);
-                  	       
-                  	       if(s1!=null)
-                  	       {
-                  	    	   
-                  	    	    return ResponseEntity.ok("SeatNumber is Sucressfully Featched By the id "+seatNumber);
-                  	       }
-                  	       
-                  	       
-                  	       else {
-                  	    	   
-                  	    	       return  ResponseEntity.status(HttpStatus.NOT_FOUND)
-                  	    	                      .body("SeatNumber is Not found with that the id : "+seatNumber);
-                  	       }
-                  	       
-                  }
-                  
-                  
-                  @GetMapping("/findAllBookings")
-                  public List<BookMyShow> getAllBookig()
-                  {
-                	  
-                	  List<BookMyShow> show =  bookingService.getAllBookings();
-                	  
-                	  return show;
-                  }
-                  
-                  
-                  @GetMapping("/getByBookingid/{bookingid}")
-                  public ResponseEntity<String> getByBookingid(@PathVariable("bookingid") String booking_id)
-                  {
-                	  
-                	  
-                	  BookMyShow show = bookingService.getbybookingid(booking_id);
-                			  {
-                		  
-                		  
-                		              if(show!=null)
-                		              {
-                		            	  
-                		            	  return ResponseEntity.ok("Bookingid Sucessfully Fetched by This :"+booking_id);
-                		              }
-                		              
-                		             
-                		              
-                		              throw new BookingIdNotfoundException("Message : Booking is not found with the booking id");
-                		              
-                			  }
-                			  
-                			  
-                			  
-                			 
-                  }
-                  }
+
+	@PutMapping("/cancel/{Bookingid}")
+	public ResponseEntity<String> cancelBooking(@PathVariable String Bookingid , @RequestBody CancelDto dto) throws UserNotfoundException
+	{
+
+		try {
+			String    status  =bookingService.CancelBooking(Bookingid, dto.getUserid(), dto.getReason());
+
+			return ResponseEntity.ok(status);
+
+		} catch (CancelBookingException  e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND)
+					.body("Error : " +  e.getMessage());
+		}
+
+
+
+	}
+	@GetMapping("/findAllMovies")
+	public List<Movie> FindAllMovies()
+	{
+
+		List<Movie> m1 = bookingService.getAllMovies();
+
+		return m1;
+	}
+
+	@GetMapping("/FindAllTheatres")
+	public List<Theatre> FindAllTheatre()
+	{
+		List<Theatre> t2 = bookingService.getAlltheatres();
+
+		return t2;
+	}
+
+
+
+	@GetMapping("/getByseatid/{id}")
+	public ResponseEntity<String> getbyseatNumber(@PathVariable ("id") String seatNumber)
+	{
+		BookMyShow s1 = bookingService.findbyseatnumber(seatNumber);
+		if(s1!=null)
+		{
+			return ResponseEntity.ok("SeatNumber is Sucressfully Featched By the id "+seatNumber);
+		}
+		else {
+			return  ResponseEntity.status(HttpStatus.NOT_FOUND)
+					.body("SeatNumber is Not found with that the id : "+seatNumber);
+		}
+
+	}
+
+
+	@GetMapping("/findAllBookings")
+	public List<BookMyShow> getAllBookig()
+	{
+
+		List<BookMyShow> show =  bookingService.getAllBookings();
+
+		return show;
+	}
+
+
+	@GetMapping("/getByBookingid/{bookingid}")
+	public ResponseEntity<String> getByBookingid(@PathVariable("bookingid") String booking_id)
+	{
+		BookMyShow show = bookingService.getbybookingid(booking_id);
+		{
+			if(show!=null)
+			{
+				return ResponseEntity.ok("Bookingid Sucessfully Fetched by This :"+booking_id);
+			}
+			throw new BookingIdNotfoundException("Message : Booking is not found with the booking id");
+
+		}
+	}
+}
 
 
 
 
 
-                    
 
 
 
 
-                  
-                  
+
+
+
 
 
