@@ -26,31 +26,30 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "Your_Ticket")
 public class BookMyShow {
-	
+
 	@Id
 	@Column(name = "booking_id")
 	private String bookingId;
 	@Column(name = "SeatNumber")
-    private String seatNumber; // ✅ MUST EXIST with ths exact name
-	
-    @CreationTimestamp
+	private String seatNumber; 
+
+	@CreationTimestamp
 	@Column(updatable = false)
 	private LocalDateTime createdAt;
-    
-    
-    @Enumerated(EnumType.STRING)
-    @Column(name = "Booking_Status")
-    private BookingStatus bookingstatus;
-    
-       @Column(name = "reason")
-       private String reason;
-       
-      
-	   
+
+	@Enumerated(EnumType.STRING)
+	@Column(name = "Booking_Status")
+	private BookingStatus bookingstatus;
+
+	@Column(name = "reason")
+	private String reason;
+
 	@ManyToOne
 	private Movie movie;
+
 	@ManyToOne
 	private Theatre theatre;
+
 	@ManyToOne
 	private User user;
 
