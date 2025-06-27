@@ -5,10 +5,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
-import com.CineReserve.Appuser.User;
 import com.CineReserve.BookingCineReserve.BookMyShow;
-import com.CineReserve.BookingDTO.BookingDTO;
 import com.CineReserve.Movie.Movie;
 import com.CineReserve.Theatre.Theatre;
 
