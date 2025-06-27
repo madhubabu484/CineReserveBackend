@@ -17,6 +17,7 @@ import com.CineReserve.BookingCineReserve.BookMyShow;
 import com.CineReserve.BookingDTO.BookingDTO;
 import com.CineReserve.BookingService.BookingService;
 import com.CineReserve.Canceldto.CancelDto;
+import com.CineReserve.CustomException.BookingIdNotfoundException;
 import com.CineReserve.CustomException.CancelBookingException;
 import com.CineReserve.CustomException.UserNotfoundException;
 import com.CineReserve.Movie.Movie;
@@ -55,9 +56,9 @@ public class BookingController {
        	 
        	 return ResponseEntity.ok(status);
 
-        } catch (CancelBookingException | UserNotfoundException e) {
+        } catch (CancelBookingException  e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                                 .body("Error : " + e.getMessage());
+                                 .body("Error : " +  e.getMessage());
         }
     	
     	
@@ -101,7 +102,54 @@ public class BookingController {
                   	       }
                   	       
                   }
+                  
+                  
+                  @GetMapping("/findAllBookings")
+                  public List<BookMyShow> getAllBookig()
+                  {
+                	  
+                	  List<BookMyShow> show =  bookingService.getAllBookings();
+                	  
+                	  return show;
                   }
+                  
+                  
+                  @GetMapping("/getByBookingid/{bookingid}")
+                  public ResponseEntity<String> getByBookingid(@PathVariable("bookingid") String booking_id)
+                  {
+                	  
+                	  
+                	  BookMyShow show = bookingService.getbybookingid(booking_id);
+                			  {
+                		  
+                		  
+                		              if(show!=null)
+                		              {
+                		            	  
+                		            	  return ResponseEntity.ok("Bookingid Sucessfully Fetched by This :"+booking_id);
+                		              }
+                		              
+                		             
+                		              
+                		              throw new BookingIdNotfoundException("Message : Booking is not found with the booking id");
+                		              
+                			  }
+                			  
+                			  
+                			  
+                			 
+                  }
+                  }
+
+
+
+
+
+                    
+
+
+
+
                   
                   
 

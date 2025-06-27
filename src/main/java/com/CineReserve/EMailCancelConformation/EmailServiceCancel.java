@@ -13,7 +13,7 @@ public class EmailServiceCancel {
 	       @Autowired
 	      private   JavaMailSender mailsender;
 	
-	  public void TicketCancellation( BookMyShow booking , String to , String subject , String body)
+	  public void TicketCancellation(BookMyShow booking , String to, String subject , String body)
 	  {
 		  
 		     SimpleMailMessage message  = new SimpleMailMessage();
@@ -32,5 +32,9 @@ public class EmailServiceCancel {
 		  
 		  
 	  }
+
+	public void TicketCancellation(String email, BookMyShow booking) {
+		
+	}
 
 }

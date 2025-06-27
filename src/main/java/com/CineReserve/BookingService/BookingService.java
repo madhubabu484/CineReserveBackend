@@ -9,6 +9,7 @@ import com.CineReserve.Appuser.User;
 import com.CineReserve.BookingCineReserve.BookMyShow;
 import com.CineReserve.BookingDTO.BookingDTO;
 import com.CineReserve.BookingRepository.BookingRepo;
+import com.CineReserve.CustomException.BookingIdNotfoundException;
 import com.CineReserve.CustomException.MovieNotFoundException;
 import com.CineReserve.CustomException.TheatreNotfoundException;
 import com.CineReserve.CustomException.UserNotfoundException;
@@ -39,6 +40,9 @@ public class BookingService {
 
 	    @Autowired
 	    private EmailService emailservice;
+	    
+	    @Autowired
+	    private EmailServiceCancel servicecancel;
 	   
 	    public boolean isSeatAlreadyBooked(BookingDTO dto) {
 	        Movie movie = movieRepo.findById(dto.getMovie()).orElseThrow();
@@ -80,7 +84,7 @@ public class BookingService {
 	         show.setSeatNumber(dto.getSeatNumber());
 	         show.setTheatre(theatre);
 	         show.setMovie(movie);
-	         show.setBookingstatus(BookingStatus.Booked);
+	         show.setBookingstatus(BookingStatus.pending);
 	         show.setUser(u1);
 	       
 
@@ -98,7 +102,7 @@ public class BookingService {
 	        	    "\n\nEnjoy the show! 🍿"
 	            );
 	        
-	        
+	       
 
 	            return show;
 	        }
@@ -128,7 +132,14 @@ public class BookingService {
 	    			  //Step 4 : save the Booking
 	    			 repo.save(booking);
 	    			 
-	    			 return " Your Ticket   is Sucessfully Cancelled";
+	    			 
+	    			 
+	    			 // Now we are call the TicketConformation method inside the Booking Service
+	    			 
+	    			 servicecancel .TicketCancellation(booking.getUser().getEmail(), booking);
+
+	    			
+	    			 return " Your Ticket   is Sucessfully Cancelled and also conformation sent your Email";
 	    			 
 	    			
 	    			
@@ -176,6 +187,27 @@ public class BookingService {
 	    }
 	    
 	    
+	    
+	    public List<BookMyShow> getAllBookings()
+	    {
+	    	
+	    	 List<BookMyShow> book = repo.findAll();
+	    	      return book;
+	    }
+	    
+	    
+	    public BookMyShow getbybookingid(String booking_id)
+	    {
+	    	
+	    	   
+	    	           BookMyShow show = repo.findByBookingId(booking_id)
+	    	        		                 .orElseThrow(()-> new BookingIdNotfoundException("Bookinf id is Not Found with the id : "+booking_id));	    	             
+	    	        		                		 return show;
+	    }
+	    
+	    
+	    
+	  
 	    
 	    
 	    
