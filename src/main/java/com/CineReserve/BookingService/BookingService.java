@@ -1,6 +1,7 @@
 package com.CineReserve.BookingService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -8,215 +9,181 @@ import org.springframework.stereotype.Service;
 import com.CineReserve.Appuser.User;
 import com.CineReserve.BookingCineReserve.BookMyShow;
 import com.CineReserve.BookingDTO.BookingDTO;
+import com.CineReserve.BookingDTO.BookingResponseDTO;
 import com.CineReserve.BookingRepository.BookingRepo;
 import com.CineReserve.CustomException.BookingIdNotfoundException;
+import com.CineReserve.CustomException.CancelBookingException;
 import com.CineReserve.CustomException.MovieNotFoundException;
+import com.CineReserve.CustomException.SeatAlreadyBookedException;
 import com.CineReserve.CustomException.TheatreNotfoundException;
 import com.CineReserve.CustomException.UserNotfoundException;
 import com.CineReserve.CustomGenaratorid.Customgenaratorid;
-import com.CineReserve.EMailCancelConformation.EmailServiceCancel;
 import com.CineReserve.EMailConfiguration.EmailService;
 import com.CineReserve.Enum.BookingStatus;
 import com.CineReserve.Movie.Movie;
+import com.CineReserve.MovieDto.MovieResponseDTO;
 import com.CineReserve.MovieRepository.MovieRepo;
 import com.CineReserve.Repository.UserRepo;
 import com.CineReserve.Theatre.Theatre;
 import com.CineReserve.TheatreRepo.TheatreRepo;
+import com.CineReserve.mappers.BookingMapper;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class BookingService {
-	
-	    @Autowired
-	    private BookingRepo repo;
 
-	    @Autowired
-	    private MovieRepo movieRepo;
+	@Autowired
+	private BookingRepo bookingRepository;
 
-	    @Autowired
-	    private TheatreRepo theatreRepo;
-	    
-	    @Autowired
-	    private UserRepo userrepo; // ✅ Correct type
+	@Autowired
+	private MovieRepo movieRepo;
 
-	    @Autowired
-	    private EmailService emailservice;
-	    
-	    @Autowired
-	    private EmailServiceCancel servicecancel;
-	   
-	    public boolean isSeatAlreadyBooked(BookingDTO dto) {
-	        Movie movie = movieRepo.findById(dto.getMovie()).orElseThrow();
-	        Theatre theatre = theatreRepo.findById(dto.getTheatre()).orElseThrow();
-	        
-	        User user = userrepo.findById(dto.getUserid()).orElseThrow();
+	@Autowired
+	private TheatreRepo theatreRepo;
 
-	        return repo.existsByMovieAndTheatreAndSeatNumber(movie, theatre, dto.getSeatNumber());
+	@Autowired
+	private UserRepo userRepository;
+
+	@Autowired
+	private EmailService emailService;
+
+	@Autowired
+	private BookingMapper bookingMapper;
+
+	public boolean isSeatAlreadyBooked(BookingDTO dto) {
+	    Long movieId = dto.getMovieId();
+	    Long theatreId = dto.getTheatreId();
+	    String seatNumber = dto.getSeatNumber();
+
+	    if (movieId == null || theatreId == null || seatNumber == null || seatNumber.isBlank()) {
+	        throw new IllegalArgumentException("Movie, Theatre, and Seat Number must be provided.");
 	    }
 
-	    public BookMyShow saveBooking(BookingDTO dto) throws UserNotfoundException {
+	    return bookingRepository.existsByTheatreIdAndMovieIdAndSeatNumber(theatreId, movieId, seatNumber);
+	}
 
-	        // 🔍 Debug prints to verify incoming values
-	        System.out.println(">>> Movie ID: " + dto.getMovie());
-	        System.out.println(">>> Theatre ID: " + dto.getTheatre());
-	        System.out.println(">>> Seat Number: " + dto.getSeatNumber());
-	        System.out.println(">>>>>User ID  :"+dto.getUserid());
-	       
 
-	        if (dto.getMovie() == null || dto.getTheatre() == null) {
-	            throw new IllegalArgumentException("Movie ID or Theatre ID is null");
-	        }
+	@Transactional
+	public BookingResponseDTO bookTicket(BookingDTO dto) 
+	{		 
+		// 1. Fetch Required Entities
+		User user = userRepository.findById(dto.getUserId())
+				.orElseThrow(() -> new UserNotfoundException("User not found"));
+		Movie movie = movieRepo.findById(dto.getMovieId())
+				.orElseThrow(() -> new MovieNotFoundException("Movie not found"));
+		Theatre theatre = theatreRepo.findById(dto.getTheatreId())
+				.orElseThrow(() -> new TheatreNotfoundException("Theatre not found"));
 
-	        Movie movie = movieRepo.findById(dto.getMovie())
-	            .orElseThrow(() -> new MovieNotFoundException("Movie not found"));
+		// 2. Check if seat is already booked
+		if (bookingRepository.existsByTheatreIdAndMovieIdAndSeatNumber(
+				dto.getTheatreId(), dto.getMovieId(), dto.getSeatNumber())) {
+			throw new SeatAlreadyBookedException("Seat already booked");
+		}
 
-	        Theatre theatre = theatreRepo.findById(dto.getTheatre())
-	            .orElseThrow(() ->  new TheatreNotfoundException("Theatre Not Found"));
-	        
+		// 3. Create Booking
+		BookMyShow booking = BookMyShow.builder()
+				.bookingId(Customgenaratorid.generateNextId())
+				.seatNumber(dto.getSeatNumber())
+				.theatre(theatre)
+				.movie(movie)
+				.user(user)
+				.bookingstatus(BookingStatus.pending)
+				.build();
 
-	        User u1 = userrepo.findById(dto.getUserid())
-	            .orElseThrow(() ->  new UserNotfoundException("User  Not Found"));
-	        
-	        
-	        
-	        
-	        BookMyShow show = new BookMyShow();
-	        show.setBookingId(Customgenaratorid.generateNextId());
-	         show.setSeatNumber(dto.getSeatNumber());
-	         show.setTheatre(theatre);
-	         show.setMovie(movie);
-	         show.setBookingstatus(BookingStatus.pending);
-	         show.setUser(u1);
-	       
+		bookingRepository.save(booking);
 
-	        
+		// 4. Send confirmation email
+		emailService.sendBookingConfirmation(user, booking);
 
-	        repo.save(show);
-	        
-	        emailservice.BookingConformation(
-	        		u1.getEmail(),
-	        	    "CineReserve Ticket Confirmation",
-	        	    "Hi " + u1.getName() + ",\n\nYour Booking ID is: " + show.getBookingId() +
-	        	    "\nMovie: " + movie.getName() +
-	        	    "\nTheatre: " + theatre.getTheatrename() +
-	        	    "\nYourSeat Number is : " + dto.getSeatNumber() +
-	        	    "\n\nEnjoy the show! 🍿"
-	            );
-	        
-	       
+		// 5. Convert to response DTO
+		return bookingMapper.toResponseDTO(booking);
 
-	            return show;
-	        }
-	        
-	        
-	    
-	    
-	    
-	    public String  CancelBooking(String bookingid , Long id , String reason) throws UserNotfoundException
-	    {
-	    	
-	    	 //STEP 1 : Fetch the User Based on the User 
-	    	 
-	    	   User u1 = userrepo.findById(id)
-	    			             .orElseThrow(()-> new UserNotfoundException("user is not found with that id : "+id));
-	    			           
-            //STEP 2 : fetch Booking id And User id for Booking Cancellation
-	    			             
-	    			     BookMyShow booking = repo.findByBookingIdAndUser_id(bookingid,id)
-	    			    		                  .orElseThrow(()-> new UserNotfoundException("Booking id and user id is not found Here"));
-	    			    		                 
-	    			//Update the Status    		                 
-	    			 booking.setBookingstatus(BookingStatus.Cancelled);
-	    			 
-	    			 booking.setReason(reason);
-	    			 
-	    			  //Step 4 : save the Booking
-	    			 repo.save(booking);
-	    			 
-	    			 
-	    			 
-	    			 // Now we are call the TicketConformation method inside the Booking Service
-	    			 
-	    			 servicecancel .TicketCancellation(booking.getUser().getEmail(), booking);
+	}
 
-	    			
-	    			 return " Your Ticket   is Sucessfully Cancelled and also conformation sent your Email";
-	    			 
-	    			
-	    			
-	    			 
-	    			    		                 
-	    			    		                 
-	    }
-	    
-	   
-	    
-	   //Next Api find the  All Movies 
-	    public List<Movie> getAllMovies()
-	    {
-	    	
-	    	
-	    	    List<Movie> m1 = movieRepo.findAll();
-				return m1;
-	    	
-	    }
-	    
-	    
-	    // Next API Find the All Theatres
-	    
-	    
-	    
-	    public List<Theatre> getAlltheatres()
-	    {
-	    	
-	    	List<Theatre> t1 = theatreRepo.findAll();
-	    	
-	    	   return t1;
-	    }
-	    
-	    
-	    // FindBySeatNumber
-	    
-	    public BookMyShow findbyseatnumber(String seatNumber)
-	    {
-	    	
-	    	
-	    	    BookMyShow seat = repo.findByseatNumber(seatNumber)
-	    	    		                       .orElseThrow(()-> new RuntimeException("SeatNumber is Not Found with the id :"+seatNumber)) ;
-	    	    
-	    	    return seat;
-	    }
-	    
-	    
-	    
-	    public List<BookMyShow> getAllBookings()
-	    {
-	    	
-	    	 List<BookMyShow> book = repo.findAll();
-	    	      return book;
-	    }
-	    
-	    
-	    public BookMyShow getbybookingid(String booking_id)
-	    {
-	    	
-	    	   
-	    	           BookMyShow show = repo.findByBookingId(booking_id)
-	    	        		                 .orElseThrow(()-> new BookingIdNotfoundException("Bookinf id is Not Found with the id : "+booking_id));	    	             
-	    	        		                		 return show;
-	    }
-	    
-	    
-	    
-	  
-	    
-	    
-	    
+	@Transactional
+	public String cancelBooking(String bookingId, Long userId, String reason) {
+
+		// Step 1: Validate user
+		User user = userRepository.findById(userId)
+				.orElseThrow(() -> new UserNotfoundException("User not found with ID: " + userId));
+
+		// Step 2: Validate booking exists for this user
+		BookMyShow booking = bookingRepository.findByBookingIdAndUser_Id(bookingId, userId)
+				.orElseThrow(() -> new CancelBookingException("Booking not found for ID: " + bookingId + " and user ID: " + userId));
+
+		// Step 3: Check if already cancelled
+		if (booking.getBookingstatus() == BookingStatus.Cancelled) {
+			throw new CancelBookingException("Booking is already cancelled.");
+		}
+
+		// Step 4: Cancel booking
+		booking.setBookingstatus(BookingStatus.Cancelled);
+		booking.setReason(reason);
+		bookingRepository.save(booking);
+
+		// Step 5: Send cancellation email
+		emailService.sendCancellationEmail(user.getEmail(), booking);
+
+		return "✅ Ticket has been successfully cancelled. Confirmation sent to your email.";
+	}
+
+	public List<MovieResponseDTO> getAllMovies() {
+		List<Movie> movies = movieRepo.findAll();
+
+		return movies.stream()
+				.map(movie -> MovieResponseDTO.builder()
+						.id(movie.getId())
+						.name(movie.getName())
+						.genre(movie.getGenre())
+						.heroName(movie.getHeroname())
+						.heroineName(movie.getHeroniename())
+						.build())
+				.collect(Collectors.toList());
+	}
+
+
+
+	// Next API Find the All Theatres
+	public List<Theatre> getAlltheatres()
+	{
+		List<Theatre> t1 = theatreRepo.findAll();
+		return t1;
+	}
+
+	// FindBySeatNumber
+	public BookMyShow findbyseatnumber(String seatNumber)
+	{
+		BookMyShow seat = bookingRepository.findByseatNumber(seatNumber)
+				.orElseThrow(()-> new RuntimeException("SeatNumber is Not Found with the id :"+seatNumber)) ;
+
+		return seat;
+	}
+
+
+	public List<BookingResponseDTO> getAllBookings() {
+	    List<BookMyShow> bookings = bookingRepository.findAll();
+
+	    return bookings.stream()
+	            .map(bookingMapper::toResponseDTO)
+	            .collect(Collectors.toList());
+	}
+
+
+	public BookingResponseDTO getByBookingId(String bookingId) {
+	    BookMyShow booking = bookingRepository.findByBookingId(bookingId)
+	            .orElseThrow(() ->
+	                    new BookingIdNotfoundException("Booking not found for ID: " + bookingId));
+
+	    return bookingMapper.toResponseDTO(booking);
+	}
+
 }
-	    			    		                 
-	    			    		                 
-	    			    		                 
-	    			    		                 
-	    			            		                 
+
+
+
+
+
 
 
 

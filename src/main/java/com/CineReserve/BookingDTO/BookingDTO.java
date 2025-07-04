@@ -1,30 +1,23 @@
 package com.CineReserve.BookingDTO;
 
-import java.time.LocalDate;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class BookingDTO {
 
-	private Long userid;
+    @NotNull(message = "User ID is required")
+    private Long userId;
 
-	private String bookingid;
+    @NotNull(message = "Movie ID is required")
+    private Long movieId;
 
-	private Long movie;
+    @NotNull(message = "Theatre ID is required")
+    private Long theatreId;
 
-	private Long theatre;
-
-	private String seatNumber;
-
-	private String status;
-
-	private String reason;
-
-	private LocalDate creat;
-
+    @NotBlank(message = "Seat number is required")
+    private String seatNumber;
 }
