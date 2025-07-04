@@ -7,11 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CancelDto {
-	
-	
-	private String reason;
-	
-	private Long userid;
-
+public class CancelBookingDTO 
+{	
+	private String reason;	
+	private Long userId;
 }

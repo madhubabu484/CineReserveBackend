@@ -22,8 +22,8 @@ public class Movie {
     private Long id;
 	@Column(name = "name")
 	private String name;
-	@Column(name = "Gonere")
-    private String gonere;
+	@Column(name = "Genre")
+    private String genre;
 	@Column(name = "heroname")
     private String heroname;
 	@Column(name = "heroniename")

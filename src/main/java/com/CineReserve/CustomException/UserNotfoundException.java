@@ -1,11 +1,10 @@
 package com.CineReserve.CustomException;
 
-public class UserNotfoundException extends Exception {
-	
-	
+@SuppressWarnings("serial")
+public class UserNotfoundException extends RuntimeException 
+{	
 	public UserNotfoundException(String message)
 	{
-		  super(message);
+		super(message);
 	}
-
 }

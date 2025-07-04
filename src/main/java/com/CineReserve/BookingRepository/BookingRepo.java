@@ -5,16 +5,15 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
 import com.CineReserve.BookingCineReserve.BookMyShow;
-import com.CineReserve.Movie.Movie;
-import com.CineReserve.Theatre.Theatre;
 
 @Repository
 public interface BookingRepo extends JpaRepository<BookMyShow , String> {
-    boolean existsByMovieAndTheatreAndSeatNumber(Movie movieid, Theatre theatreid,String seatNumber);
     
      Optional<BookMyShow> findByBookingIdAndUser_id(String bookingid , Long userid);
      
+     boolean existsByTheatreIdAndMovieIdAndSeatNumber(Long theatreId, Long movieId, String seatNumber);  
      
      Optional<BookMyShow> findByseatNumber(String seatNumber);
      
@@ -22,6 +21,7 @@ public interface BookingRepo extends JpaRepository<BookMyShow , String> {
      
      Optional<BookMyShow> findByBookingId(String booking_id);
    
+     Optional<BookMyShow> findByBookingIdAndUser_Id(String bookingId, Long userId);
     
     
 }
