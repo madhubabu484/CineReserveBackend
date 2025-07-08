@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.CineReserve.Appuser.AppUser;
 import com.CineReserve.Appuser.User;
 import com.CineReserve.BookingCineReserve.BookMyShow;
 import com.CineReserve.BookingDTO.BookingDTO;
@@ -68,7 +69,7 @@ public class BookingService {
 	public BookingResponseDTO bookTicket(BookingDTO dto) 
 	{		 
 		// 1. Fetch Required Entities
-		User user = userRepository.findById(dto.getUserId())
+		AppUser user = userRepository.findById(dto.getUserId())
 				.orElseThrow(() -> new UserNotfoundException("User not found"));
 		Movie movie = movieRepo.findById(dto.getMovieId())
 				.orElseThrow(() -> new MovieNotFoundException("Movie not found"));
@@ -105,7 +106,7 @@ public class BookingService {
 	public String cancelBooking(String bookingId, Long userId, String reason) {
 
 		// Step 1: Validate user
-		User user = userRepository.findById(userId)
+		AppUser user = userRepository.findById(userId)
 				.orElseThrow(() -> new UserNotfoundException("User not found with ID: " + userId));
 
 		// Step 2: Validate booking exists for this user
@@ -179,11 +180,3 @@ public class BookingService {
 	}
 
 }
-
-
-
-
-
-
-
-
