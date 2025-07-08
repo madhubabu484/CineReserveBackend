@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
 
-import com.CineReserve.Appuser.User;
+import com.CineReserve.Appuser.AppUser;
 import com.CineReserve.Enum.BookingStatus;
 import com.CineReserve.Movie.Movie;
 import com.CineReserve.Theatre.Theatre;
@@ -51,6 +51,6 @@ public class BookMyShow {
 	private Theatre theatre;
 
 	@ManyToOne
-	private User user;
+	private AppUser user;
 
 }

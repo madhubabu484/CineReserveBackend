@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.CineReserve.Appuser.User;
+import com.CineReserve.Appuser.AppUser;
 import com.CineReserve.BookingCineReserve.BookMyShow;
 import com.CineReserve.BookingDTO.BookingDTO;
 import com.CineReserve.BookingRepository.BookingRepo;
@@ -48,7 +48,7 @@ public class BookingService {
 	        Movie movie = movieRepo.findById(dto.getMovie()).orElseThrow();
 	        Theatre theatre = theatreRepo.findById(dto.getTheatre()).orElseThrow();
 	        
-	        User user = userrepo.findById(dto.getUserid()).orElseThrow();
+	        AppUser user = userrepo.findById(dto.getUserid()).orElseThrow();
 
 	        return repo.existsByMovieAndTheatreAndSeatNumber(movie, theatre, dto.getSeatNumber());
 	    }
@@ -73,7 +73,7 @@ public class BookingService {
 	            .orElseThrow(() ->  new TheatreNotfoundException("Theatre Not Found"));
 	        
 
-	        User u1 = userrepo.findById(dto.getUserid())
+	        AppUser u1 = userrepo.findById(dto.getUserid())
 	            .orElseThrow(() ->  new UserNotfoundException("User  Not Found"));
 	        
 	        
@@ -116,7 +116,7 @@ public class BookingService {
 	    	
 	    	 //STEP 1 : Fetch the User Based on the User 
 	    	 
-	    	   User u1 = userrepo.findById(id)
+	    	   AppUser u1 = userrepo.findById(id)
 	    			             .orElseThrow(()-> new UserNotfoundException("user is not found with that id : "+id));
 	    			           
             //STEP 2 : fetch Booking id And User id for Booking Cancellation

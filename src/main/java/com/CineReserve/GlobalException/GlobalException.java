@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import com.CineReserve.CustomException.BookingIdNotfoundException;
 import com.CineReserve.CustomException.CancelBookingException;
 import com.CineReserve.CustomException.MovieNotFoundException;
+import com.CineReserve.CustomException.UserNameAndPasswordNotValidException;
 import com.CineReserve.CustomException.UserNotfoundException;
 
 @ControllerAdvice
@@ -53,6 +54,15 @@ public class GlobalException {
 	    	
 	    	  return ResponseEntity.status(HttpStatus.NOT_FOUND)
 	    			               .body("Error : "+ex.getMessage());
+	    }
+	    
+	    
+	    public ResponseEntity<String> handleUserNameAndPasswordNotValidException(UserNameAndPasswordNotValidException ex)
+	    {
+	    	
+	    	 return ResponseEntity
+	    			    .status(HttpStatus.NOT_FOUND)
+	    			    .body("Error : "+ex.getMessage());
 	    }
 	    
 	   
