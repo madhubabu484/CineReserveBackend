@@ -1,4 +1,4 @@
-package com.CineReserve.Movie;
+package com.CineReserve.Appuser;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,25 +10,21 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@Entity
+@Table(name = "Person_Details")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
-@Table(name = "movie")
-public class Movie {
-	
+public class User {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+	@Column(name = "id")
+	private Long id;
+
 	@Column(name = "name")
 	private String name;
-	@Column(name = "Genre")
-    private String genre;
-	@Column(name = "heroname")
-    private String heroname;
-	@Column(name = "heroniename")
-    private String heroniename;
-	
-	
 
+	@Column(name = "email")
+	private String email;
 }
