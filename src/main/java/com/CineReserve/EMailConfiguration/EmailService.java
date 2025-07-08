@@ -2,12 +2,13 @@ package com.CineReserve.EMailConfiguration;
 
 import org.springframework.stereotype.Service;
 
+import com.CineReserve.Appuser.AppUser;
 import com.CineReserve.Appuser.User;
 import com.CineReserve.BookingCineReserve.BookMyShow;
 
 @Service
 public class EmailService {
-	public void sendBookingConfirmation(User user, BookMyShow booking) {
+	public void sendBookingConfirmation(AppUser user, BookMyShow booking) {
 		String content = String.format("""
 				    Hi %s,
 
