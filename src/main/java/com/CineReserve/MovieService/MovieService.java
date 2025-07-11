@@ -49,20 +49,14 @@ public class MovieService {
 	//Search By MovieName Based on the it's Name
 	public String  findByMovieName(String name)
 	{
-		Movie movie = repo.findByNameIgnoreCase(name)
-				.orElseThrow(()->  new RuntimeException("Movie name is Not found with that the name :"+name));
+		repo.findByNameIgnoreCase(name)
+		.orElseThrow(()->  new RuntimeException("Movie name is Not found with that the name :"+name));
 		return "movie";            	     
 	}
 
 	public String findByGonere(String gonere)
 	{
-
-		Movie m2 = repo.findBygenoreIgnoreCase(gonere)
-
-		Movie m2 = repo.findByGenreIgnoreCase(gonere)
-
-				.orElseThrow(() -> new RuntimeException("Gonre is Not found with the name  : "+gonere));
-
+		repo.findBygenoreIgnoreCase(gonere).orElseThrow(() -> new RuntimeException("Gonre is Not found with the name  : "+gonere));
 		return "Movie";
 	}
 

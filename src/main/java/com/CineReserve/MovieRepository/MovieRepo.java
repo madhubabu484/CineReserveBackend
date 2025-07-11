@@ -17,9 +17,6 @@ public interface MovieRepo extends JpaRepository<Movie, Long>
 
 	Optional<Movie> findByNameIgnoreCase(String name);
 
-
 	Optional<Movie> findBygenoreIgnoreCase(String genore );
-
-	Optional<Movie> findByGenreIgnoreCase(String genre );
 
 }
