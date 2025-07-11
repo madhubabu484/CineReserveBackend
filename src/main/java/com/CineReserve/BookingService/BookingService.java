@@ -89,7 +89,7 @@ public class BookingService {
 				.theatre(theatre)
 				.movie(movie)
 				.user(user)
-				.bookingstatus(BookingStatus.pending)
+				.bookingstatus(BookingStatus.Booked)
 				.build();
 
 		bookingRepository.save(booking);
@@ -131,16 +131,15 @@ public class BookingService {
 
 	public List<MovieResponseDTO> getAllMovies() {
 		List<Movie> movies = movieRepo.findAll();
-
 		return movies.stream()
-				.map(movie -> MovieResponseDTO.builder()
-						.id(movie.getId())
-						.name(movie.getName())
-						.genre(movie.getGenre())
-						.heroName(movie.getHeroname())
-						.heroineName(movie.getHeroniename())
-						.build())
-				.collect(Collectors.toList());
+		        .map((Movie movie) -> MovieResponseDTO.builder()
+		            .id(movie.getId())
+		            .name(movie.getName())
+		            .genre(movie.getGenore())
+		            .heroName(movie.getHeroname())         
+		            .heroineName(movie.getHeroniename())   
+		            .build())
+		        .collect(Collectors.toList());
 	}
 
 

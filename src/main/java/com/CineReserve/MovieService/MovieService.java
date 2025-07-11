@@ -56,7 +56,7 @@ public class MovieService {
 
 	public String findByGonere(String gonere)
 	{
-		Movie m2 = repo.findByGonereIgnoreCase(gonere)
+		Movie m2 = repo.findBygenoreIgnoreCase(gonere)
 				.orElseThrow(() -> new RuntimeException("Gonre is Not found with the name  : "+gonere));
 
 		return "Movie";
@@ -79,7 +79,7 @@ public class MovieService {
 
 		if(m2!=null)
 		{
-			m2.setGenre("Mass And Action AND love  Flim"); 
+			m2.setGenore(null); 
 			//Next we will Save the UpdateMovie
 			repo.save(m2);
 		}else {

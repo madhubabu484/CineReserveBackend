@@ -27,7 +27,7 @@ public class SecurityConfiguration {
 	  @Autowired
 	  private UserService service;
 
-    // Bean to encode passwords using BCrypt
+     //Bean to encode passwords using BCrypt
     @Bean
     public BCryptPasswordEncoder encoder() {
         return new BCryptPasswordEncoder();
@@ -57,20 +57,20 @@ public class SecurityConfiguration {
     
       
 
-    // Defines the security filter chain (what is protected and how)
+     //Defines the security filter chain (what is protected and how)
     @Bean
     @SneakyThrows
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     	
-    	http
-        .csrf().disable()
-        .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/login", "/register").permitAll()
-            .requestMatchers("/movies/**").authenticated()
-            .anyRequest().denyAll()
-        )
-        .formLogin(Customizer.withDefaults())
-        .logout(Customizer.withDefaults());
-    	return http.build();
-    }
+    	
+    	    http
+    	        .csrf().disable()
+    	        .authorizeHttpRequests(auth -> auth
+    	            .requestMatchers("/login", "/register", "/adduser","/book/create","/book/cancel/YOURBOOKINGID-E21005FF").permitAll()
+    	            .anyRequest().authenticated()
+    	        )
+    	        .httpBasic(Customizer.withDefaults())  
+    	        .logout(Customizer.withDefaults());
+    	    return http.build();
+    	}
 }
