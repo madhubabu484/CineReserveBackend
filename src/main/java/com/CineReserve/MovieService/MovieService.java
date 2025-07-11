@@ -56,7 +56,11 @@ public class MovieService {
 
 	public String findByGonere(String gonere)
 	{
+
 		Movie m2 = repo.findBygenoreIgnoreCase(gonere)
+
+		Movie m2 = repo.findByGenreIgnoreCase(gonere)
+
 				.orElseThrow(() -> new RuntimeException("Gonre is Not found with the name  : "+gonere));
 
 		return "Movie";

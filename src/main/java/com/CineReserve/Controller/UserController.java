@@ -1,7 +1,6 @@
-
-
 package com.CineReserve.Controller;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,18 +8,11 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.security.core.Authentication;
-
 
 import com.CineReserve.Appuser.AppUser;
 import com.CineReserve.CustomException.UserNameAndPasswordNotValidException;
 import com.CineReserve.Service.UserService;
-import com.CineReserve.UserDto.UserDto;
-
-import jakarta.validation.Valid;
-import lombok.val;
 
 @RestController
 public class UserController {
@@ -67,28 +59,17 @@ public class UserController {
 	@PostMapping("/register")
 	public ResponseEntity<String> userRegister(@RequestBody AppUser user)
 	{
-
 		boolean   status = servive.saveuser(user);
 		{
-
-
 			if(status)
 			{
-
 				return ResponseEntity.ok("User Sucessfully Registred");
 			}
-
 			else {
-
 				return ResponseEntity.status(HttpStatus.NOT_FOUND)
 						.body("User is Not Registred sucessfully Please try Again Some time : "+user);
 			}
-
 		}
-
-
-
-
 	}
 
 }
