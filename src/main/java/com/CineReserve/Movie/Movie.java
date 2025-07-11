@@ -7,6 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -15,6 +16,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Table(name = "movie")
+@Builder
 public class Movie {
 	
 	@Id
@@ -22,8 +24,8 @@ public class Movie {
     private Long id;
 	@Column(name = "name")
 	private String name;
-	@Column(name = "Genre")
-    private String genre;
+	@Column(name = "genore")
+    private String genore;
 	@Column(name = "heroname")
     private String heroname;
 	@Column(name = "heroniename")

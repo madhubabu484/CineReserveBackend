@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AppUser implements UserDetails  {
+public class AppUser   {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -40,17 +40,8 @@ public class AppUser implements UserDetails  {
 	@Column(name = "Password")
 	private String password;
 
-	@Override
-	public Collection<? extends GrantedAuthority> getAuthorities() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String getUsername() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	
+	
 
 	
 }

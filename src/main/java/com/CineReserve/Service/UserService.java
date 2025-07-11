@@ -25,7 +25,12 @@ public class UserService implements UserDetailsService {
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 		AppUser a1 = userrepo.findByEmail(email);
 		return new User(a1.getEmail(), a1.getPassword(), Collections.emptyList()); // Here return new User it is a predifined method avalible in UserDetails Method.
+
+
+}
+
 	}
+
 
 	public boolean saveuser(AppUser user)
 	{
