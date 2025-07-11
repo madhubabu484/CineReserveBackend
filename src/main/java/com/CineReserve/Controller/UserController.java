@@ -20,7 +20,6 @@ public class UserController {
 	@Autowired
 	private UserService servive;
 
-
 	@Autowired 
 	private AuthenticationManager authManager;
 
@@ -28,32 +27,29 @@ public class UserController {
 	public boolean adduser(@RequestBody AppUser user)
 	{
 		boolean  saveuser = servive.saveuser(user);
-
 		return saveuser;
-
 	}
 
 
 	@PostMapping("/login")
 	public ResponseEntity<String> UserLogin(@RequestBody AppUser user) {
+		try {
+			// it is used to set the login credentials for Validation
+			UsernamePasswordAuthenticationToken token =
+					new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword());
 
-	    try {
-	        // it is used to set the login credentials for Validation
-	        UsernamePasswordAuthenticationToken token =
-	                new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword());
+			// AuthManager is valid our Login Credentials.
+			Authentication authenticate = authManager.authenticate(token);
 
-	        // AuthManager is valid our Login Credentials.
-	        Authentication authenticate = authManager.authenticate(token);
+			if (authenticate.isAuthenticated()) {
+				return ResponseEntity.ok("User successfully logged in with credentials: " + user.getEmail());
+			} else {
+				throw new UserNameAndPasswordNotValidException("Invalid username or password.");
+			}
 
-	        if (authenticate.isAuthenticated()) {
-	            return ResponseEntity.ok("User successfully logged in with credentials: " + user.getEmail());
-	        } else {
-	            throw new UserNameAndPasswordNotValidException("Invalid username or password.");
-	        }
-
-	    } catch (Exception ex) {
-	        throw new UserNameAndPasswordNotValidException("Invalid username or password. Details: " + ex.getMessage());
-	    }
+		} catch (Exception ex) {
+			throw new UserNameAndPasswordNotValidException("Invalid username or password. Details: " + ex.getMessage());
+		}
 	}
 
 	@PostMapping("/register")
